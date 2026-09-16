@@ -33,8 +33,7 @@ $$
 where $\mu$ is the per-site mutation rate. Thus,
 
 $$
-\boldsymbol{\xi}
-=
+\boldsymbol{\xi} = 
 \left(
 2n\mu,\,
 n\mu,\,
@@ -55,8 +54,7 @@ Rather than beginning with an observed SFS and attempting to infer the evolution
 The SFS is modeled as a continuous-time dynamical system,
 
 $$
-\frac{d\boldsymbol{\xi}}{dt}
-=
+\frac{d\boldsymbol{\xi}}{dt} = 
 G\boldsymbol{\xi}+\boldsymbol{m},
 $$
 
@@ -69,8 +67,7 @@ where:
 For a discrete time step $\Delta t$, the corresponding Euler update is
 
 $$
-\boldsymbol{\xi}_{t+\Delta t}
-=
+\boldsymbol{\xi}_{t+\Delta t} = 
 \boldsymbol{\xi}_t
 +
 \left(
@@ -87,16 +84,14 @@ $$
 so
 
 $$
-G\boldsymbol{\xi}_{\mathrm{eq}}
-=
+G\boldsymbol{\xi}_{\mathrm{eq}} = 
 -\boldsymbol{m}.
 $$
 
 New mutations are introduced into the lowest-frequency class. In this model,
 
 $$
-\boldsymbol{m}
-=
+\boldsymbol{m} = 
 (2n\mu,0,\dots,0).
 $$
 
@@ -109,24 +104,21 @@ A specific drift matrix can therefore be constructed by imposing additional stru
 This implementation uses a nearest-neighbor transition structure motivated by the Moran model. For frequency class $j$,
 
 $$
-G_{j,j}
-=
+G_{j,j} = 
 -\frac{2j(n-j)}{n},
 $$
 
 with neighboring transition terms
 
 $$
-G_{j,j+1}
-=
+G_{j,j+1} = 
 \frac{(j+1)(n-j-1)}{n}
 $$
 
 and
 
 $$
-G_{j,j-1}
-=
+G_{j,j-1} = 
 \frac{(j-1)(n-j+1)}{n}.
 $$
 
@@ -139,8 +131,7 @@ This produces a tridiagonal drift matrix in which mutations move between neighbo
 Because $G$ and $\boldsymbol{m}$ are constant, the differential equation has the closed-form solution
 
 $$
-\boldsymbol{\xi}(t)
-=
+\boldsymbol{\xi}(t) = 
 e^{Gt}
 \left(
 \boldsymbol{\xi}_0-\boldsymbol{\xi}_{\mathrm{eq}}
@@ -152,8 +143,7 @@ $$
 where
 
 $$
-\boldsymbol{\xi}_{\mathrm{eq}}
-=
+\boldsymbol{\xi}_{\mathrm{eq}} = 
 -G^{-1}\boldsymbol{m}.
 $$
 
