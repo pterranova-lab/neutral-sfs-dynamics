@@ -1,73 +1,174 @@
 # neutral-sfs-dynamics
 A computational model of time-dependent site-frequency spectrum dynamics under neutral Wright–Fisher drift and recurrent mutation.
 
-# Time-Dependent Site-Frequency Spectrum Dynamics
+# neutral-sfs-dynamics
 
-A computational model for exploring how a site-frequency spectrum (SFS) evolves through time under neutral genetic drift and recurrent mutation using a Wright–Fisher framework.
+A computational model of time-dependent site-frequency spectrum dynamics under neutral genetic drift and recurrent mutation.
 
 ## Overview
 
-The site-frequency spectrum describes the number of mutations observed at different allele frequencies within a sampled population.
+The Site Frequency Spectrum (SFS) is a summary statistic describing the frequencies of mutations observed in a population.
 
-This project models the SFS as a dynamical system derived from the neutral Wright–Fisher model. Rather than starting with an observed SFS and attempting to infer the evolutionary process that produced it, the model starts with a specified evolutionary process and examines how the frequency distribution changes over time.
-
-The central dynamical system is
+For a sample of size $n$, define
 
 $$
-\frac{d\xi}{dt} = G\xi + m
+\xi_j = \text{number of mutations observed at allele frequency } j,
+$$
+
+where $j = 1,\dots,n-1$.
+
+The SFS can therefore be represented as the vector
+
+$$
+\boldsymbol{\xi}
+=
+(\xi_1,\xi_2,\dots,\xi_{n-1}).
+$$
+
+Under a constant population size and neutral evolution, mutation and genetic drift produce a characteristic equilibrium SFS. In the standard neutral model, the expected spectrum has the form
+
+$$
+\xi_j = \frac{2n\mu}{j},
+$$
+
+where $\mu$ is the per-site mutation rate. Thus,
+
+$$
+\boldsymbol{\xi}
+=
+\left(
+2n\mu,\,
+n\mu,\,
+\frac{2}{3}n\mu,\,
+\dots,\,
+\frac{2n\mu}{n-1}
+\right).
+$$
+
+This project asks a forward-modeling question:
+
+> Given a specified evolutionary process, how does the SFS change through time before reaching its equilibrium distribution?
+
+Rather than beginning with an observed SFS and attempting to infer the evolutionary history that produced it, the model begins with an initial SFS and explicitly evolves it under a specified mutation-drift process.
+
+## Mathematical Model
+
+The SFS is modeled as a continuous-time dynamical system,
+
+$$
+\frac{d\boldsymbol{\xi}}{dt}
+=
+G\boldsymbol{\xi}+\boldsymbol{m},
 $$
 
 where:
 
-- $\xi$ is the vector of mutation counts across allele-frequency classes
-- $G$ is the transition matrix describing neutral Wright–Fisher genetic drift
-- $m$ is the mutation input vector
+- $\boldsymbol{\xi}$ is the vector of mutation counts across frequency classes
+- $G$ is the drift matrix
+- $\boldsymbol{m}$ represents the introduction of new mutations
 
-For constant $G$ and $m$, the system has the analytic solution
-
-$$
-\xi(t) =
-e^{Gt}(\xi_0-\xi_{\mathrm{eq}})
-+\xi_{\mathrm{eq}}
-$$
-
-where the equilibrium distribution satisfies
+For a discrete time step $\Delta t$, the corresponding Euler update is
 
 $$
-G\xi_{\mathrm{eq}} + m = 0
+\boldsymbol{\xi}_{t+\Delta t}
+=
+\boldsymbol{\xi}_t
++
+\left(
+G\boldsymbol{\xi}_t+\boldsymbol{m}
+\right)\Delta t.
 $$
 
-and therefore
+At equilibrium,
 
 $$
-\xi_{\mathrm{eq}} = -G^{-1}m.
+\frac{d\boldsymbol{\xi}}{dt}=0,
 $$
 
-The model can therefore be used to examine how an arbitrary initial SFS approaches the neutral equilibrium expected under the Wright–Fisher process.
-
-## Wright–Fisher Model
-
-The underlying population-genetic framework is the neutral Wright–Fisher model, with genetic drift represented as transitions between neighboring allele-frequency classes.
-
-For a population represented by $n$ sampled chromosomes, the model contains $n-1$ segregating-frequency classes. The drift matrix $G$ is constructed from the Wright–Fisher transition structure.
-
-Mutation is represented by an input vector in which new mutations enter the lowest-frequency class.
-
-Under the assumptions of the neutral model, the equilibrium has the classical inverse-frequency form
+so
 
 $$
-\xi_j \propto \frac{1}{j},
+G\boldsymbol{\xi}_{\mathrm{eq}}
+=
+-\boldsymbol{m}.
 $$
 
-corresponding to the familiar power-law structure of the neutral SFS.
+New mutations are introduced into the lowest-frequency class. In this model,
 
-## Implementations
+$$
+\boldsymbol{m}
+=
+(2n\mu,0,\dots,0).
+$$
+
+## Constructing the Drift Matrix
+
+The equilibrium condition alone does not uniquely determine $G$. There are $n-1$ equilibrium equations but $(n-1)^2$ entries in an unrestricted $(n-1)\times(n-1)$ matrix.
+
+A specific drift matrix can therefore be constructed by imposing additional structure on the evolutionary process.
+
+This implementation uses a nearest-neighbor transition structure motivated by the Moran model. For frequency class $j$,
+
+$$
+G_{j,j}
+=
+-\frac{2j(n-j)}{n},
+$$
+
+with neighboring transition terms
+
+$$
+G_{j,j+1}
+=
+\frac{(j+1)(n-j-1)}{n}
+$$
+
+and
+
+$$
+G_{j,j-1}
+=
+\frac{(j-1)(n-j+1)}{n}.
+$$
+
+All other entries are zero.
+
+This produces a tridiagonal drift matrix in which mutations move between neighboring allele-frequency classes through genetic drift.
+
+## Analytic Solution
+
+Because $G$ and $\boldsymbol{m}$ are constant, the differential equation has the closed-form solution
+
+$$
+\boldsymbol{\xi}(t)
+=
+e^{Gt}
+\left(
+\boldsymbol{\xi}_0-\boldsymbol{\xi}_{\mathrm{eq}}
+\right)
++
+\boldsymbol{\xi}_{\mathrm{eq}},
+$$
+
+where
+
+$$
+\boldsymbol{\xi}_{\mathrm{eq}}
+=
+-G^{-1}\boldsymbol{m}.
+$$
+
+The analytic implementation evaluates this solution using the matrix exponential.
+
+This allows the SFS to be evaluated directly at selected time points rather than integrating the system one time step at a time.
+
+## Numerical Implementation
 
 Two implementations are provided.
 
-### Numerical Euler Integration
+### Euler Integration
 
-`simulate_sfs()` evolves the SFS using a discrete Euler update:
+`simulate_sfs()` evolves the SFS numerically using the discrete Euler update:
 
 ```r
 SFS <- SFS + (G %*% SFS + m) * dt
