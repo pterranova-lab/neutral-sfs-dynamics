@@ -173,3 +173,14 @@ This repository contains two primary R functions for simulating the time evoluti
   $$\hat{\alpha} = 1 + \frac{N_{fit}}{\sum \log(x / x_{min})}$$
 ```r
 SFS <- SFS + (G %*% SFS + m) * dt
+
+## References
+
+1. Watterson, G. A. (1975). On the number of segregating sites in genetical models without recombination. *Theoretical Population Biology*, 7(2), 256–276.  
+   https://doi.org/10.1016/0040-5809(75)90020-9
+
+2. Moran, P. A. P. (1958). Random processes in genetics. *Mathematical Proceedings of the Cambridge Philosophical Society*, 54(1), 60–71.  
+   https://doi.org/10.1017/S0305004100033193
+
+3. Chen, Y., et al. (2026). Accurate detection of tumor clonality and ongoing expansion mode from genomic data. *bioRxiv*.  
+   https://doi.org/10.64898/2026.06.15.732415
