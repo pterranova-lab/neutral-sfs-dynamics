@@ -151,13 +151,25 @@ The analytic implementation evaluates this solution using the matrix exponential
 
 This allows the SFS to be evaluated directly at selected time points rather than integrating the system one time step at a time.
 
-## Numerical Implementation
+## Code Implementation & Architecture
 
-Two implementations are provided.
+This repository contains two primary R functions for simulating the time evolution of the Site Frequency Spectrum (SFS) under neutral Wright-Fisher diffusion, alongside downstream tail-index parameter estimation.
 
-### Euler Integration
+### 1. Numerical Euler Simulation (`simulate_sfs`)
+* **Initialization**: Randomly samples initial mutations across allele frequency bins from $1$ to $n-1$, utilizing `factor()` to ensure zero-count bins are properly retained.
+* **Sparse Drift Matrix ($G$)**: Constructs a tridiagonal sparse matrix using the `Matrix` package to efficiently compute transition probabilities governed by genetic drift.
+* **Discrete Time-Stepping**: Evolves the SFS forward iteratively via an explicit Euler update:
+  $$\xi(t + \Delta t) = \xi(t) + [G\xi(t) + m]\Delta t$$
+* **Automated Rendering**: Integrates `ggplot2` to automatically output high-resolution bar plot snapshots (`.png`) at specified simulation `timestamps`.
 
-`simulate_sfs()` evolves the SFS numerically using the discrete Euler update:
+### 2. Analytic Matrix Exponential Solution (`simulate_sfs_analytic`)
+* **Exact Propagation**: Bypasses discrete approximation errors by computing the closed-form analytical solution using matrix exponentials via the `expm` package:
+  $$\xi(t) = e^{Gt}(\xi_0 - \xi_{eq}) + \xi_{eq}$$
+* **Equilibrium Solver**: Solves directly for the steady-state distribution where $\xi_{eq} = -G^{-1}m$.
 
+### 3. Maximum Likelihood Tail-Index ($\alpha$) Estimation
+* Extracts Variant Allele Frequencies (VAF) from the final SFS vector.
+* Fits a Pareto maximum likelihood estimator above a frequency threshold ($x_{min}$) to calculate the tail index ($\hat{\alpha}$):
+  $$\hat{\alpha} = 1 + \frac{N_{fit}}{\sum \log(x / x_{min})}$$
 ```r
 SFS <- SFS + (G %*% SFS + m) * dt
