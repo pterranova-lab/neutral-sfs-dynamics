@@ -35,10 +35,10 @@ where $\mu$ is the per-site mutation rate. Thus,
 $$
 \boldsymbol{\xi} = 
 \left(
-2n\mu,\,
-n\mu,\,
-\frac{2}{3}n\mu,\,
-\dots,\,
+2n\mu,
+n\mu,
+\frac{2}{3}n\mu,
+\dots,
 \frac{2n\mu}{n-1}
 \right).
 $$
