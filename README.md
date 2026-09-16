@@ -174,6 +174,8 @@ This repository contains two primary R functions for simulating the time evoluti
 ```r
 SFS <- SFS + (G %*% SFS + m) * dt
 
+```
+
 ## References
 
 1. Watterson, G. A. (1975). On the number of segregating sites in genetical models without recombination. *Theoretical Population Biology*, 7(2), 256–276.  
