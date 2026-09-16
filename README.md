@@ -20,7 +20,7 @@ where $j = 1,\dots,n-1$.
 The SFS can therefore be represented as the vector
 
 $$
-\boldsymbol{xi} = 
+\boldsymbol{\xi} = 
 (\xi_1,\xi_2,\dots,\xi_{n-1}).
 $$
 
